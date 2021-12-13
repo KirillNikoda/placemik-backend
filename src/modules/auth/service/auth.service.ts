@@ -4,10 +4,26 @@ import * as b from 'bcrypt';
 import { UsersService } from '@modules/users/service/users.service';
 import { RegisterUserDto } from '@modules/auth/dto/register.dto';
 import { LoginUserDto } from '@modules/auth/dto/login.dto';
+import { TokenPayload } from '@modules/auth/interfaces/token-payload.interface';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { CookieOptions } from 'express';
+
+const cookieOptions: CookieOptions = {
+  domain: 'localhost',
+  secure: false,
+  sameSite: 'strict',
+  httpOnly: true,
+  path: '/',
+};
 
 @Injectable()
 export class AuthenticationService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private usersService: UsersService
+  ) {}
 
   public async getAuthenticatedUser(email: string, hashedPassword: string) {
     try {
@@ -30,7 +46,7 @@ export class AuthenticationService {
       });
 
       return createdUser;
-    } catch (e) {
+    } catch (e: any) {
       // postgres error appears while trying to add already existing row
       if (e?.code === PostgresErrorCode.UniqueViolation) {
         throw new HttpException(
@@ -45,7 +61,29 @@ export class AuthenticationService {
     }
   }
 
-  public async login(loginUserDto: LoginUserDto) {}
+  public async login(loginUserDto: LoginUserDto) {
+    const user = await this.usersService.getByEmail(loginUserDto.email);
+
+    if (!user) {
+      throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      await this.verifyPassword(loginUserDto.password, user.password);
+    } catch (e) {
+      throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
+    }
+
+    return user;
+  }
+
+  public getCookieWithJwtToken(userId: number) {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload);
+    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+      'JWT_EXPIRATION_TIME'
+    )}`;
+  }
 
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {
     const isPasswordMatching = await b.compare(plainTextPassword, hashedPassword);

@@ -1,0 +1,26 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Float!
+  email: String!
+  firstName: String
+  lastName: String
+}
+
+type Query {
+  getUsers: [User!]!
+  sayHello: String!
+}
+
+type Mutation {
+  register(registerUserInput: RegisterUserDto!): User!
+  login: String!
+}
+
+input RegisterUserDto {
+  firstName: String
+  lastName: String
+  password: String!
+}

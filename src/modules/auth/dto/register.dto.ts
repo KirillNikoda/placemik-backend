@@ -1,12 +1,13 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
-import { LoginUserDto } from '@modules/auth/dto/login.dto';
-
-@ObjectType()
-export class RegisterUserDto extends LoginUserDto {
+@InputType()
+export class RegisterUserDto {
   @Field({ nullable: true })
   public firstName?: string;
 
   @Field({ nullable: true })
   public lastName?: string;
+
+  @Field()
+  public password!: string;
 }
