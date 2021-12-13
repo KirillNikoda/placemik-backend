@@ -1,9 +1,9 @@
+import { User } from '@modules/users/entities/user.entity';
+import { UsersService } from '@modules/users/service/users.service';
 import { Resolver, Query } from '@nestjs/graphql';
-import { User } from 'src/modules/users/entities/user.entity';
-import { UsersService } from '../service/users.service';
 
 @Resolver()
-export class AuthResolver {
+export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Query(() => [User])

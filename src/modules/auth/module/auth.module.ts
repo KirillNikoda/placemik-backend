@@ -1,8 +1,9 @@
+import { AuthenticationResolver } from '@modules/auth/resolver/auth.resolver';
+import { AuthenticationService } from '@modules/auth/service/auth.service';
 import { Module } from '@nestjs/common';
-import { AuthenticationService } from '../service/auth.service';
 
 @Module({
   imports: [],
-  providers: [AuthenticationService],
+  providers: [AuthenticationService, AuthenticationResolver],
 })
 export class AuthenticationModule {}

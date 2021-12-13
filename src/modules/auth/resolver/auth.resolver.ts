@@ -1,10 +1,9 @@
+import { AuthenticationService } from '@modules/auth/service/auth.service';
+import { User } from '@modules/users/entities/user.entity';
 import { Resolver, Mutation } from '@nestjs/graphql';
 
-import { User } from 'src/modules/users/entities/user.entity';
-import { AuthenticationService } from '../service/auth.service';
-
 @Resolver()
-export class AuthResolver {
+export class AuthenticationResolver {
   constructor(private readonly authService: AuthenticationService) {}
 
   @Mutation(() => User)
