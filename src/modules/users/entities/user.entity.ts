@@ -6,21 +6,24 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class User {
   @PrimaryGeneratedColumn()
   @Field()
-  id!: number;
+  public id?: number;
 
-  @Column()
+  @Column({ unique: true })
   @Field()
-  email!: string;
+  public email!: string;
 
   @Column({ name: 'first_name' })
   @Field({ nullable: true })
-  firstName?: string;
+  public firstName?: string;
 
   @Column({ name: 'last_name' })
   @Field({ nullable: true })
-  lastName?: string;
+  public lastName?: string;
 
   // didn't use @Field decorator cuz we are not gonna query passwords of our users
   @Column()
-  password?: string;
+  public password!: string;
+
+  @Column({ nullable: true })
+  refreshToken?: string;
 }
