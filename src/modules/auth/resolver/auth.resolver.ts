@@ -1,3 +1,4 @@
+import { LoginUserDto } from '@modules/auth/dto/login.dto';
 import { RegisterUserDto } from '@modules/auth/dto/register.dto';
 import { AuthenticationService } from '@modules/auth/service/auth.service';
 import { User } from '@modules/users/entities/user.entity';
@@ -15,11 +16,17 @@ export class AuthenticationResolver {
     return this.authService.register(registerUserDto);
   }
 
-  @Mutation(() => String)
-  public async login(@Context() ctx: Ctx) {
-    console.log(ctx.req.cookies);
+  @Mutation(() => User)
+  public async login(
+    @Args('loginUserInput') loginUserDto: LoginUserDto,
+    @Context() ctx: Ctx
+  ) {
+    return this.authService.login(loginUserDto, ctx);
+  }
 
-    ctx.res.cookie('my-cookie', 'cookie value');
-    return '123';
+  @Mutation()
+  public async logOut(@Context() ctx: Ctx) {
+    ctx.res.cookie('access_token', this.authService.getCookieForLogOut());
+    return ctx.res.sendStatus(200);
   }
 }

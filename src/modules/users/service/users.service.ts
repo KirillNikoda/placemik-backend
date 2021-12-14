@@ -9,8 +9,8 @@ import { RegisterUserDto } from '@modules/auth/dto/register.dto';
 export class UsersService {
   constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
-  public async getByEmail(email: string) {
-    const user = await this.usersRepository.findOne({ email });
+  public async getBy(filterOptions: Partial<User>) {
+    const user = await this.usersRepository.findOne(filterOptions);
 
     if (user) {
       return user;

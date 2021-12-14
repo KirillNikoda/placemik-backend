@@ -8,6 +8,7 @@ import { TokenPayload } from '@modules/auth/interfaces/token-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CookieOptions } from 'express';
+import { Ctx } from 'types/context';
 
 const cookieOptions: CookieOptions = {
   domain: 'localhost',
@@ -27,7 +28,7 @@ export class AuthenticationService {
 
   public async getAuthenticatedUser(email: string, hashedPassword: string) {
     try {
-      const user = await this.usersService.getByEmail(email);
+      const user = await this.usersService.getBy({ email });
       await this.verifyPassword(user.password, hashedPassword);
 
       return user;
@@ -61,8 +62,8 @@ export class AuthenticationService {
     }
   }
 
-  public async login(loginUserDto: LoginUserDto) {
-    const user = await this.usersService.getByEmail(loginUserDto.email);
+  public async login(loginUserDto: LoginUserDto, ctx: Ctx) {
+    const user = await this.usersService.getBy({ email: loginUserDto.email });
 
     if (!user) {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
@@ -74,6 +75,8 @@ export class AuthenticationService {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
     }
 
+    ctx.res.cookie('access_token', this.getCookieWithJwtToken(user.id));
+
     return user;
   }
 
@@ -83,6 +86,10 @@ export class AuthenticationService {
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME'
     )}`;
+  }
+
+  public getCookieForLogOut() {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {
