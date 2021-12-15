@@ -9,6 +9,10 @@ type User {
   lastName: String
 }
 
+type BooleanResult {
+  success: Boolean!
+}
+
 type Query {
   getUsers: [User!]!
   sayHello: String!
@@ -17,7 +21,7 @@ type Query {
 type Mutation {
   register(registerUserInput: RegisterUserDto!): User!
   login(loginUserInput: LoginUserDto!): User!
-  logout: String!
+  logout: BooleanResult!
 }
 
 input RegisterUserDto {

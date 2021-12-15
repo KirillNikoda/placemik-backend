@@ -1,7 +1,7 @@
-import { cookiesOptions } from '@modules/auth/cookies-options';
 import { LoginUserDto } from '@modules/auth/dto/login.dto';
 import { RegisterUserDto } from '@modules/auth/dto/register.dto';
 import { AuthenticationService } from '@modules/auth/services/auth.service';
+import { BooleanResult } from '@modules/core/dto/boolean-result.dto';
 import { User } from '@modules/users/entities/user.entity';
 import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
 import { Ctx } from 'types/context';
@@ -25,9 +25,11 @@ export class AuthenticationResolver {
     return this.authService.login(loginUserDto, ctx);
   }
 
-  @Mutation(() => String)
+  @Mutation(() => BooleanResult)
   public async logout(@Context() ctx: Ctx) {
     ctx.res.cookie('Authentication', '');
-    return 'successfully logged out';
+    return {
+      success: true,
+    };
   }
 }
