@@ -6,17 +6,17 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class User {
   @PrimaryGeneratedColumn()
   @Field()
-  public id?: number;
+  public id!: number;
 
   @Column({ unique: true })
   @Field()
   public email!: string;
 
-  @Column({ name: 'first_name' })
+  @Column({ name: 'first_name', nullable: true })
   @Field({ nullable: true })
   public firstName?: string;
 
-  @Column({ name: 'last_name' })
+  @Column({ name: 'last_name', nullable: true })
   @Field({ nullable: true })
   public lastName?: string;
 
@@ -24,6 +24,6 @@ export class User {
   @Column()
   public password!: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'refresh_token' })
   refreshToken?: string;
 }

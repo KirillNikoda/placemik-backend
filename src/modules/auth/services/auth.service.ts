@@ -8,6 +8,9 @@ import { TokenPayload } from '@modules/auth/interfaces/token-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CookieOptions } from 'express';
+import { Ctx } from 'types/context';
+import { AuthCookies } from '@modules/auth/interfaces/auth-cookies';
+import { AuthCookiesConfigurationService } from '@modules/auth/services/auth-cookies-configurator.service';
 
 const cookieOptions: CookieOptions = {
   domain: 'localhost',
@@ -20,14 +23,13 @@ const cookieOptions: CookieOptions = {
 @Injectable()
 export class AuthenticationService {
   constructor(
-    private jwtService: JwtService,
-    private configService: ConfigService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private authCookiesConfigurator: AuthCookiesConfigurationService
   ) {}
 
   public async getAuthenticatedUser(email: string, hashedPassword: string) {
     try {
-      const user = await this.usersService.getByEmail(email);
+      const user = await this.usersService.getBy({ email });
       await this.verifyPassword(user.password, hashedPassword);
 
       return user;
@@ -61,8 +63,8 @@ export class AuthenticationService {
     }
   }
 
-  public async login(loginUserDto: LoginUserDto) {
-    const user = await this.usersService.getByEmail(loginUserDto.email);
+  public async login(loginUserDto: LoginUserDto, ctx: Ctx) {
+    const user = await this.usersService.getBy({ email: loginUserDto.email });
 
     if (!user) {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
@@ -74,15 +76,9 @@ export class AuthenticationService {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
     }
 
-    return user;
-  }
+    this.authCookiesConfigurator.setTokensIntoCookies(user.id, ctx);
 
-  public getCookieWithJwtToken(userId: number) {
-    const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
-      'JWT_EXPIRATION_TIME'
-    )}`;
+    return user;
   }
 
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {

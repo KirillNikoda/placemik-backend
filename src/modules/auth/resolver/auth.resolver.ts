@@ -1,15 +1,9 @@
+import { LoginUserDto } from '@modules/auth/dto/login.dto';
 import { RegisterUserDto } from '@modules/auth/dto/register.dto';
-import { AuthenticationService } from '@modules/auth/service/auth.service';
+import { AuthenticationService } from '@modules/auth/services/auth.service';
+import { BooleanResult } from '@modules/core/dto/boolean-result.dto';
 import { User } from '@modules/users/entities/user.entity';
-import {
-  Resolver,
-  Mutation,
-  Args,
-  Context,
-  GraphQLExecutionContext,
-  Query,
-} from '@nestjs/graphql';
-import { Response } from 'express';
+import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
 import { Ctx } from 'types/context';
 
 @Resolver()
@@ -23,6 +17,19 @@ export class AuthenticationResolver {
     return this.authService.register(registerUserDto);
   }
 
-  @Mutation(() => String)
-  public async login(@Context() ctx: Ctx) {}
+  @Mutation(() => User)
+  public async login(
+    @Args('loginUserInput') loginUserDto: LoginUserDto,
+    @Context() ctx: Ctx
+  ) {
+    return this.authService.login(loginUserDto, ctx);
+  }
+
+  @Mutation(() => BooleanResult)
+  public async logout(@Context() ctx: Ctx) {
+    ctx.res.cookie('Authentication', '');
+    return {
+      success: true,
+    };
+  }
 }

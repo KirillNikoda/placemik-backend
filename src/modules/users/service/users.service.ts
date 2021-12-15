@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as b from 'bcrypt';
 
 import { User } from '@modules/users/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -9,8 +10,8 @@ import { RegisterUserDto } from '@modules/auth/dto/register.dto';
 export class UsersService {
   constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
 
-  public async getByEmail(email: string) {
-    const user = await this.usersRepository.findOne({ email });
+  public async getBy(filterOptions: Partial<User>) {
+    const user = await this.usersRepository.findOne(filterOptions);
 
     if (user) {
       return user;
@@ -20,6 +21,13 @@ export class UsersService {
       'User with this email does not exist',
       HttpStatus.NOT_FOUND
     );
+  }
+
+  public async setCurrentRefreshToken(refreshToken: string, userId: number) {
+    const currentHashedRefreshToken = await b.hash(refreshToken, 10);
+    await this.usersRepository.update(userId, {
+      refreshToken: currentHashedRefreshToken,
+    });
   }
 
   public async create(registerUserDto: RegisterUserDto) {
