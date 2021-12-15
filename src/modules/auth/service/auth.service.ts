@@ -75,21 +75,15 @@ export class AuthenticationService {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
     }
 
-    ctx.res.cookie('access_token', this.getCookieWithJwtToken(user.id));
+    ctx.res.cookie('Authentication', this.generateJwtToken(user.id), cookieOptions);
 
     return user;
   }
 
-  public getCookieWithJwtToken(userId: number) {
+  public generateJwtToken(userId: number) {
     const payload: TokenPayload = { userId };
     const token = this.jwtService.sign(payload);
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
-      'JWT_EXPIRATION_TIME'
-    )}`;
-  }
-
-  public getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+    return token;
   }
 
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {

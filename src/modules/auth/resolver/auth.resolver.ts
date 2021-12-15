@@ -1,3 +1,4 @@
+import { cookiesOptions } from '@modules/auth/cookies-options';
 import { LoginUserDto } from '@modules/auth/dto/login.dto';
 import { RegisterUserDto } from '@modules/auth/dto/register.dto';
 import { AuthenticationService } from '@modules/auth/service/auth.service';
@@ -24,9 +25,9 @@ export class AuthenticationResolver {
     return this.authService.login(loginUserDto, ctx);
   }
 
-  @Mutation()
-  public async logOut(@Context() ctx: Ctx) {
-    ctx.res.cookie('access_token', this.authService.getCookieForLogOut());
-    return ctx.res.sendStatus(200);
+  @Mutation(() => String)
+  public async logout(@Context() ctx: Ctx) {
+    ctx.res.cookie('Authentication', '');
+    return 'successfully logged out';
   }
 }
