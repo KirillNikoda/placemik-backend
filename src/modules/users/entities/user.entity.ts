@@ -24,6 +24,6 @@ export class User {
   @Column()
   public password!: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'refresh_token' })
   refreshToken?: string;
 }

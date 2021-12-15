@@ -9,6 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CookieOptions } from 'express';
 import { Ctx } from 'types/context';
+import { AuthCookies } from '@modules/auth/interfaces/auth-cookies';
+import { AuthCookiesConfigurationService } from '@modules/auth/services/auth-cookies-configurator.service';
 
 const cookieOptions: CookieOptions = {
   domain: 'localhost',
@@ -21,9 +23,8 @@ const cookieOptions: CookieOptions = {
 @Injectable()
 export class AuthenticationService {
   constructor(
-    private jwtService: JwtService,
-    private configService: ConfigService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private authCookiesConfigurator: AuthCookiesConfigurationService
   ) {}
 
   public async getAuthenticatedUser(email: string, hashedPassword: string) {
@@ -75,15 +76,9 @@ export class AuthenticationService {
       throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
     }
 
-    ctx.res.cookie('Authentication', this.generateJwtToken(user.id), cookieOptions);
+    this.authCookiesConfigurator.setTokensIntoCookies(user.id, ctx);
 
     return user;
-  }
-
-  public generateJwtToken(userId: number) {
-    const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
-    return token;
   }
 
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {

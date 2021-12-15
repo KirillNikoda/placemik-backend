@@ -1,7 +1,7 @@
 import { cookiesOptions } from '@modules/auth/cookies-options';
 import { LoginUserDto } from '@modules/auth/dto/login.dto';
 import { RegisterUserDto } from '@modules/auth/dto/register.dto';
-import { AuthenticationService } from '@modules/auth/service/auth.service';
+import { AuthenticationService } from '@modules/auth/services/auth.service';
 import { User } from '@modules/users/entities/user.entity';
 import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
 import { Ctx } from 'types/context';

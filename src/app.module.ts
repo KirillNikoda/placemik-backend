@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
-import { UsersModule } from '@modules/users/module/users.module';
-import { AuthenticationModule } from '@modules/auth/module/auth.module';
+import { UsersModule } from '@modules/users/users.module';
+import { AuthenticationModule } from '@modules/auth/auth.module';
 
 @Module({
   imports: [
