@@ -20,7 +20,7 @@ export class User {
   @Field({ nullable: true })
   public lastName?: string;
 
-  // didn't use @Field decorator cuz we are not gonna query passwords of our users
+  // didn't use @Field decorator cuz we are not going to query passwords of our users
   @Column()
   public password!: string;
 

@@ -6,9 +6,6 @@ import { Resolver, Query } from '@nestjs/graphql';
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Query(() => [User])
-  public getUsers() {}
-
   @Query(() => String)
   sayHello(): string {
     return 'Hello World!';
